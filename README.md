@@ -37,11 +37,11 @@ The application analyzes authentication logs, detects suspicious login activity,
 
 ### Main Security Dashboard
 
-![Dashboard](screenshots/dashboard-v1.6.png)
+![Dashboard](screenshots/dashboard-v1.5.png)
 
 ### Alert History
 
-![Alert History](screenshots/alert-history-v1.6.png)
+![Alert History](screenshots/alert-history-v1.5.png)
 
 ---
 
@@ -145,8 +145,8 @@ ai-log-analyzer/
 │   └── history.html
 │
 ├── screenshots/
-│   ├── dashboard-v1.6.png
-│   └── alert-history-v1.6.png
+│   ├── dashboard-v1.5.png
+│   └── alert-history-v1.5.png
 │
 ├── requirements.txt
 └── README.md
@@ -170,7 +170,7 @@ ai-log-analyzer/
 
 ## Current Release
 
-### v1.6
+### v1.5
 
 Features Added:
 
