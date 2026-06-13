@@ -1,37 +1,58 @@
-# AI Security Log Analyzer
+# Security Log Analyzer
 
-A Python-based cybersecurity project that analyzes authentication logs, detects suspicious activity, extracts indicators of compromise (IOCs), and generates incident reports.
+A Python and Flask web application that analyzes authentication logs and detects brute-force login activity.
+
+The application parses log files, identifies suspicious authentication patterns, extracts Indicators of Compromise (IOCs), and displays results through a web-based dashboard.
 
 ## Features
 
-* Log Parsing
-* Brute Force Detection
-* Successful Login After Brute Force Detection
-* MITRE ATT&CK Mapping (T1110)
-* IOC Extraction
-* Risk Scoring
-* Incident Report Generation
+* Upload and analyze log files
+* Brute-force attack detection
+* Successful login after brute-force detection
+* MITRE ATT&CK mapping (T1110)
+* IOC extraction
+* Risk score calculation
+* Security dashboard
+* Incident report generation
+
+## Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+## How It Works
+
+1. Upload a log file
+2. Parse authentication events
+3. Apply detection rules
+4. Extract IOCs
+5. Calculate risk score
+6. Display results in dashboard
 
 ## Example Detection
 
-Input Log:
+### Sample Log
 
-Failed password for admin from 192.168.1.50
-Failed password for admin from 192.168.1.50
-Failed password for admin from 192.168.1.50
-Accepted password for admin from 192.168.1.50
+Failed password for root from 10.10.10.10
 
-Output:
+Failed password for root from 10.10.10.10
 
-[HIGH] T1110 Brute Force Attack from 192.168.1.50
+Failed password for root from 10.10.10.10
 
-[CRITICAL] T1110 Successful Login After Brute Force from 192.168.1.50
+Accepted password for root from 10.10.10.10
+
+### Result
+
+[HIGH] T1110 Brute Force Attack from 10.10.10.10
+
+[CRITICAL] T1110 Successful Login After Brute Force from 10.10.10.10
 
 Risk Score: 10/10
 
 ## Project Structure
 
 ai-log-analyzer/
+
+├── app.py
 
 ├── parser.py
 
@@ -41,16 +62,33 @@ ai-log-analyzer/
 
 ├── report.py
 
-├── main.py
+├── templates/
 
-├── sample.log
+│ └── index.html
 
-└── incident_report.txt
+├── requirements.txt
 
-## Roadmap
+└── README.md
 
-* Web Dashboard (Flask)
-* AI Alert Explanations
-* Additional Detection Rules
-* PDF Reporting
-* Threat Intelligence Integration
+## Technologies Used
+
+* Python
+* Flask
+* HTML
+* CSS
+* Git
+* GitHub
+
+## Future Improvements
+
+* SQLite alert history
+* Additional detection rules
+* Threat intelligence integration
+* Interactive charts
+* Docker deployment
+
+## Author
+
+Vishal Kataria
+
+GitHub: github.com/vishalkataria077
