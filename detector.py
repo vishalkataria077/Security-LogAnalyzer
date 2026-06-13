@@ -2,6 +2,8 @@ def analyze_events(events):
 
     failed_count = {}
 
+    failed_users = {}
+
     successful_ips = set()
 
     alerts = []
@@ -18,20 +20,45 @@ def analyze_events(events):
                 failed_count.get(ip, 0) + 1
             )
 
+            if ip not in failed_users:
+                failed_users[ip] = set()
+
+            failed_users[ip].add(user)
+
         elif event["event"] == "successful_login":
 
             successful_ips.add(ip)
 
-            # Admin / Privileged Account Login Detection
-            if user.lower() in ["admin", "root", "administrator"]:
+            # MITRE ATT&CK T1078 - Valid Accounts
+            if user.lower() in [
+                "admin",
+                "root",
+                "administrator"
+            ]:
 
                 alerts.append(
-                    f"[MEDIUM] Privileged Account Login ({user}) from {ip}"
+                    f"[MEDIUM] T1078 Privileged Account Login ({user}) from {ip}"
                 )
+
+    # Password Spray Detection
+
+    for ip, users in failed_users.items():
+
+        if len(users) >= 3:
+
+            alerts.append(
+                f"[HIGH] Password Spraying Attack from {ip}"
+            )
+
+    # Brute Force Detection
 
     for ip, count in failed_count.items():
 
-        if count >= 3:
+        user_count = len(
+            failed_users.get(ip, set())
+        )
+
+        if count >= 3 and user_count < 3:
 
             alerts.append(
                 f"[HIGH] T1110 Brute Force Attack from {ip}"

@@ -7,55 +7,141 @@
 
 <style>
 
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
 body{
     background:#0d1117;
     color:white;
-    font-family:Arial;
-    margin:40px;
+    font-family:'Segoe UI', Arial, sans-serif;
+    padding:30px;
+}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+}
+
+.header{
+    margin-bottom:30px;
+}
+
+.header h1{
+    color:#58a6ff;
+    font-size:42px;
+}
+
+.header p{
+    color:#8b949e;
+    margin-top:8px;
+}
+
+.upload-box{
+    background:#161b22;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:25px;
 }
 
 .card{
     background:#161b22;
-    padding:20px;
-    border-radius:10px;
-    margin-bottom:20px;
+    padding:25px;
+    border-radius:12px;
+    margin-bottom:25px;
 }
 
 .risk{
-    font-size:32px;
+    font-size:42px;
     font-weight:bold;
 }
 
-.high{
-    color:orange;
-}
-
-.critical{
-    color:red;
-}
-
-h1{
-    color:#58a6ff;
-}
-
 .stats{
-    display:flex;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:20px;
+    margin-bottom:25px;
 }
 
 .stat-card{
     background:#161b22;
-    padding:20px;
-    border-radius:10px;
-    flex:1;
+    padding:25px;
+    border-radius:12px;
     text-align:center;
 }
 
+.stat-card h2{
+    font-size:18px;
+    margin-bottom:10px;
+}
+
+.stat-card h3{
+    font-size:36px;
+}
+
+.high{
+    color:#f59e0b;
+}
+
+.medium{
+    color:#58a6ff;
+}
+
+.critical{
+    color:#ef4444;
+}
+
 button{
-    padding:10px;
+    background:#238636;
+    color:white;
     border:none;
-    border-radius:5px;
+    padding:12px 18px;
+    border-radius:8px;
     cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover{
+    opacity:.9;
+}
+
+.action-btn{
+    background:#58a6ff;
+    color:white;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:8px;
+    margin-left:10px;
+}
+
+.section-title{
+    margin-bottom:15px;
+}
+
+.alert-list li{
+    margin-bottom:10px;
+}
+
+.ioc-list li{
+    margin-bottom:8px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+}
+
+th{
+    background:#111827;
+}
+
+th,td{
+    border:1px solid #30363d;
+    padding:12px;
+    text-align:left;
 }
 
 </style>
@@ -64,7 +150,14 @@ button{
 
 <body>
 
-<h1>🛡 AI Security Log Analyzer</h1>
+<div class="container">
+
+<div class="header">
+    <h1>🛡 AI Security Log Analyzer</h1>
+    <p>Threat Detection & Security Monitoring Dashboard</p>
+</div>
+
+<div class="upload-box">
 
 <form method="POST" enctype="multipart/form-data">
 
@@ -74,9 +167,16 @@ button{
         Analyze Log
     </button>
 
+    <a href="/history" class="action-btn">
+        View Alert History
+    </a>
+    <a href="/export" class="action-btn">
+        Export CSV
+    </a>
+
 </form>
 
-<br>
+</div>
 
 <div class="card">
 
@@ -103,45 +203,94 @@ button{
         <h3>{{ successful_logins }}</h3>
     </div>
 
-</div>
+    <div class="stat-card">
+        <h2>HIGH Alerts</h2>
+        <h3 class="high">{{ high_alerts }}</h3>
+    </div>
 
-<br>
+    <div class="stat-card">
+        <h2>MEDIUM Alerts</h2>
+        <h3 class="medium">{{ medium_alerts }}</h3>
+    </div>
 
-<div class="card">
-
-<h2>Security Alerts</h2>
-
-<ul>
-
-{% for alert in alerts %}
-
-{% if "CRITICAL" in alert %}
-<li class="critical">{{ alert }}</li>
-
-{% elif "HIGH" in alert %}
-<li class="high">{{ alert }}</li>
-
-{% else %}
-<li>{{ alert }}</li>
-{% endif %}
-
-{% endfor %}
-
-</ul>
+    <div class="stat-card">
+        <h2>CRITICAL Alerts</h2>
+        <h3 class="critical">{{ critical_alerts }}</h3>
+    </div>
 
 </div>
 
 <div class="card">
 
-<h2>Indicators of Compromise</h2>
+    <h2 class="section-title">
+        Security Alerts
+    </h2>
 
-<ul>
+    <ul class="alert-list">
 
-{% for ip in iocs %}
-<li>{{ ip }}</li>
-{% endfor %}
+    {% for alert in alerts %}
 
-</ul>
+        {% if "CRITICAL" in alert %}
+            <li class="critical">{{ alert }}</li>
+
+        {% elif "HIGH" in alert %}
+            <li class="high">{{ alert }}</li>
+
+        {% elif "MEDIUM" in alert %}
+            <li class="medium">{{ alert }}</li>
+
+        {% else %}
+            <li>{{ alert }}</li>
+
+        {% endif %}
+
+    {% endfor %}
+
+    </ul>
+
+</div>
+
+<div class="card">
+
+    <h2 class="section-title">
+        Indicators of Compromise
+    </h2>
+
+    <ul class="ioc-list">
+
+    {% for ip in iocs %}
+        <li>{{ ip }}</li>
+    {% endfor %}
+
+    </ul>
+
+</div>
+
+<div class="card">
+
+    <h2 class="section-title">
+        MITRE ATT&CK Techniques
+    </h2>
+
+    <table>
+
+        <tr>
+            <th>Technique</th>
+            <th>Description</th>
+        </tr>
+
+        {% for technique, description in techniques %}
+
+        <tr>
+            <td>{{ technique }}</td>
+            <td>{{ description }}</td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
 
 </div>
 
