@@ -23,7 +23,6 @@ def init_db():
     """)
 
     conn.commit()
-
     conn.close()
 
 
@@ -41,10 +40,7 @@ def alert_exists(ip, description):
         AND description = ?
         LIMIT 1
         """,
-        (
-            ip,
-            description
-        )
+        (ip, description)
     )
 
     result = cursor.fetchone()
@@ -54,16 +50,9 @@ def alert_exists(ip, description):
     return result is not None
 
 
-def save_alert(
-    severity,
-    ip,
-    description
-):
+def save_alert(severity, ip, description):
 
-    if alert_exists(
-        ip,
-        description
-    ):
+    if alert_exists(ip, description):
         return
 
     conn = sqlite3.connect("alerts.db")
@@ -88,27 +77,40 @@ def save_alert(
     )
 
     conn.commit()
-
     conn.close()
 
 
-def get_alerts():
+def get_alerts(severity=None, ip=None):
 
     conn = sqlite3.connect("alerts.db")
 
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    query = """
         SELECT
             timestamp,
             severity,
             ip,
             description
         FROM alerts
-        ORDER BY id DESC
-        """
-    )
+        WHERE 1=1
+    """
+
+    params = []
+
+    if severity and severity != "ALL":
+
+        query += " AND severity = ?"
+        params.append(severity)
+
+    if ip:
+
+        query += " AND ip LIKE ?"
+        params.append(f"%{ip}%")
+
+    query += " ORDER BY id DESC"
+
+    cursor.execute(query, params)
 
     alerts = cursor.fetchall()
 

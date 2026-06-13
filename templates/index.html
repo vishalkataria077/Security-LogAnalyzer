@@ -5,6 +5,8 @@
 
 <title>AI Security Log Analyzer</title>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 
 *{
@@ -16,7 +18,7 @@
 body{
     background:#0d1117;
     color:white;
-    font-family:'Segoe UI', Arial, sans-serif;
+    font-family:'Segoe UI',sans-serif;
     padding:30px;
 }
 
@@ -25,60 +27,56 @@ body{
     margin:auto;
 }
 
-.header{
-    margin-bottom:30px;
-}
-
 .header h1{
     color:#58a6ff;
-    font-size:42px;
+    font-size:48px;
 }
 
 .header p{
     color:#8b949e;
-    margin-top:8px;
+    margin-top:10px;
 }
 
 .upload-box{
     background:#161b22;
     padding:20px;
     border-radius:12px;
+    margin-top:25px;
     margin-bottom:25px;
 }
 
 .card{
     background:#161b22;
-    padding:25px;
     border-radius:12px;
+    padding:25px;
     margin-bottom:25px;
 }
 
 .risk{
-    font-size:42px;
+    font-size:48px;
     font-weight:bold;
 }
 
 .stats{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
+    gap:18px;
     margin-bottom:25px;
 }
 
 .stat-card{
     background:#161b22;
-    padding:25px;
     border-radius:12px;
+    padding:25px;
     text-align:center;
 }
 
 .stat-card h2{
-    font-size:18px;
-    margin-bottom:10px;
+    margin-bottom:15px;
 }
 
 .stat-card h3{
-    font-size:36px;
+    font-size:48px;
 }
 
 .high{
@@ -86,7 +84,7 @@ body{
 }
 
 .medium{
-    color:#58a6ff;
+    color:#60a5fa;
 }
 
 .critical{
@@ -97,35 +95,20 @@ button{
     background:#238636;
     color:white;
     border:none;
-    padding:12px 18px;
     border-radius:8px;
+    padding:12px 18px;
     cursor:pointer;
     font-weight:bold;
 }
 
-button:hover{
-    opacity:.9;
-}
-
 .action-btn{
+    display:inline-block;
+    text-decoration:none;
     background:#58a6ff;
     color:white;
-    text-decoration:none;
     padding:12px 18px;
     border-radius:8px;
     margin-left:10px;
-}
-
-.section-title{
-    margin-bottom:15px;
-}
-
-.alert-list li{
-    margin-bottom:10px;
-}
-
-.ioc-list li{
-    margin-bottom:8px;
 }
 
 table{
@@ -134,14 +117,21 @@ table{
     margin-top:15px;
 }
 
+th,td{
+    border:1px solid #30363d;
+    padding:12px;
+}
+
 th{
     background:#111827;
 }
 
-th,td{
-    border:1px solid #30363d;
-    padding:12px;
-    text-align:left;
+ul li{
+    margin-bottom:10px;
+}
+
+canvas{
+    max-height:350px;
 }
 
 </style>
@@ -153,26 +143,32 @@ th,td{
 <div class="container">
 
 <div class="header">
-    <h1>🛡 AI Security Log Analyzer</h1>
-    <p>Threat Detection & Security Monitoring Dashboard</p>
+
+<h1>🛡 AI Security Log Analyzer</h1>
+
+<p>
+Threat Detection & Security Monitoring Dashboard
+</p>
+
 </div>
 
 <div class="upload-box">
 
 <form method="POST" enctype="multipart/form-data">
 
-    <input type="file" name="logfile">
+<input type="file" name="logfile">
 
-    <button type="submit">
-        Analyze Log
-    </button>
+<button type="submit">
+Analyze Log
+</button>
 
-    <a href="/history" class="action-btn">
-        View Alert History
-    </a>
-    <a href="/export" class="action-btn">
-        Export CSV
-    </a>
+<a href="/history" class="action-btn">
+View Alert History
+</a>
+
+<a href="/export" class="action-btn">
+Export CSV
+</a>
 
 </form>
 
@@ -180,119 +176,198 @@ th,td{
 
 <div class="card">
 
-    <div class="risk">
-        Risk Score: {{ risk_score }}/10
-    </div>
+<div class="risk">
+Risk Score: {{ risk_score }}/10
+</div>
 
 </div>
 
 <div class="stats">
 
-    <div class="stat-card">
-        <h2>Total Events</h2>
-        <h3>{{ total_events }}</h3>
-    </div>
+<div class="stat-card">
+<h2>Total Events</h2>
+<h3>{{ total_events }}</h3>
+</div>
 
-    <div class="stat-card">
-        <h2>Failed Logins</h2>
-        <h3>{{ failed_logins }}</h3>
-    </div>
+<div class="stat-card">
+<h2>Failed Logins</h2>
+<h3>{{ failed_logins }}</h3>
+</div>
 
-    <div class="stat-card">
-        <h2>Successful Logins</h2>
-        <h3>{{ successful_logins }}</h3>
-    </div>
+<div class="stat-card">
+<h2>Successful Logins</h2>
+<h3>{{ successful_logins }}</h3>
+</div>
 
-    <div class="stat-card">
-        <h2>HIGH Alerts</h2>
-        <h3 class="high">{{ high_alerts }}</h3>
-    </div>
+<div class="stat-card">
+<h2>HIGH Alerts</h2>
+<h3 class="high">{{ high_alerts }}</h3>
+</div>
 
-    <div class="stat-card">
-        <h2>MEDIUM Alerts</h2>
-        <h3 class="medium">{{ medium_alerts }}</h3>
-    </div>
+<div class="stat-card">
+<h2>MEDIUM Alerts</h2>
+<h3 class="medium">{{ medium_alerts }}</h3>
+</div>
 
-    <div class="stat-card">
-        <h2>CRITICAL Alerts</h2>
-        <h3 class="critical">{{ critical_alerts }}</h3>
-    </div>
+<div class="stat-card">
+<h2>CRITICAL Alerts</h2>
+<h3 class="critical">{{ critical_alerts }}</h3>
+</div>
 
 </div>
 
 <div class="card">
 
-    <h2 class="section-title">
-        Security Alerts
-    </h2>
+<h2>Security Alerts</h2>
 
-    <ul class="alert-list">
+<br>
 
-    {% for alert in alerts %}
+<ul>
 
-        {% if "CRITICAL" in alert %}
-            <li class="critical">{{ alert }}</li>
+{% for alert in alerts %}
 
-        {% elif "HIGH" in alert %}
-            <li class="high">{{ alert }}</li>
+{% if "CRITICAL" in alert %}
+<li class="critical">{{ alert }}</li>
 
-        {% elif "MEDIUM" in alert %}
-            <li class="medium">{{ alert }}</li>
+{% elif "HIGH" in alert %}
+<li class="high">{{ alert }}</li>
 
-        {% else %}
-            <li>{{ alert }}</li>
+{% elif "MEDIUM" in alert %}
+<li class="medium">{{ alert }}</li>
 
-        {% endif %}
+{% else %}
+<li>{{ alert }}</li>
+{% endif %}
 
-    {% endfor %}
+{% endfor %}
 
-    </ul>
-
-</div>
-
-<div class="card">
-
-    <h2 class="section-title">
-        Indicators of Compromise
-    </h2>
-
-    <ul class="ioc-list">
-
-    {% for ip in iocs %}
-        <li>{{ ip }}</li>
-    {% endfor %}
-
-    </ul>
+</ul>
 
 </div>
 
 <div class="card">
 
-    <h2 class="section-title">
-        MITRE ATT&CK Techniques
-    </h2>
+<h2>Indicators of Compromise</h2>
 
-    <table>
+<br>
 
-        <tr>
-            <th>Technique</th>
-            <th>Description</th>
-        </tr>
+<ul>
 
-        {% for technique, description in techniques %}
+{% for ip in iocs %}
+<li>{{ ip }}</li>
+{% endfor %}
 
-        <tr>
-            <td>{{ technique }}</td>
-            <td>{{ description }}</td>
-        </tr>
+</ul>
 
-        {% endfor %}
+</div>
 
-    </table>
+<div class="card">
+
+<h2>MITRE ATT&CK Techniques</h2>
+
+<table>
+
+<tr>
+<th>Technique</th>
+<th>Description</th>
+</tr>
+
+{% for technique, description in techniques %}
+
+<tr>
+<td>{{ technique }}</td>
+<td>{{ description }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+<div class="card">
+
+<h2>Alert Analytics</h2>
+
+<br>
+
+<canvas id="alertChart"></canvas>
 
 </div>
 
 </div>
+
+<script>
+
+const ctx = document.getElementById('alertChart');
+
+new Chart(ctx, {
+
+type: 'bar',
+
+data: {
+
+labels: [
+'Medium',
+'High',
+'Critical'
+],
+
+datasets: [{
+
+label: 'Alert Count',
+
+data: [
+{{ medium_alerts }},
+{{ high_alerts }},
+{{ critical_alerts }}
+]
+
+}]
+
+},
+
+options: {
+
+responsive: true,
+
+plugins: {
+
+legend: {
+
+labels: {
+color: 'white'
+}
+
+}
+
+},
+
+scales: {
+
+x: {
+
+ticks: {
+color: 'white'
+}
+
+},
+
+y: {
+
+ticks: {
+color: 'white'
+}
+
+}
+
+}
+
+}
+
+});
+
+</script>
 
 </body>
 </html>

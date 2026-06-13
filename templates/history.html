@@ -3,46 +3,83 @@
 
 <head>
 
-    <title>Alert History</title>
+<title>Alert History</title>
 
-    <style>
+<style>
 
-        body{
-            background:#0d1117;
-            color:white;
-            font-family:Arial;
-            margin:40px;
-        }
+body{
+    background:#0d1117;
+    color:white;
+    font-family:Arial;
+    margin:40px;
+}
 
-        table{
-            width:100%;
-            border-collapse:collapse;
-        }
+h1{
+    color:#58a6ff;
+}
 
-        th, td{
-            border:1px solid gray;
-            padding:10px;
-        }
+.card{
+    background:#161b22;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:20px;
+}
 
-        th{
-            background:#161b22;
-        }
+table{
+    width:100%;
+    border-collapse:collapse;
+}
 
-        .critical{
-            color:red;
-            font-weight:bold;
-        }
+th,td{
+    border:1px solid #333;
+    padding:12px;
+}
 
-        .high{
-            color:orange;
-            font-weight:bold;
-        }
+th{
+    background:#111827;
+}
 
-        a{
-            color:#58a6ff;
-        }
+a{
+    color:#58a6ff;
+}
 
-    </style>
+.critical{
+    color:#ff4d4d;
+    font-weight:bold;
+}
+
+.high{
+    color:orange;
+    font-weight:bold;
+}
+
+.medium{
+    color:#60a5fa;
+    font-weight:bold;
+}
+
+.filter-btn{
+    padding:8px 14px;
+    border-radius:5px;
+    text-decoration:none;
+    margin-right:8px;
+    background:#1f2937;
+    color:white;
+}
+
+.active{
+    background:#2563eb;
+}
+
+input{
+    padding:8px;
+}
+
+button{
+    padding:8px 12px;
+}
+
+</style>
 
 </head>
 
@@ -54,35 +91,94 @@
     <a href="/">← Back to Dashboard</a>
 </p>
 
+<div class="card">
+
+<h3>Filter By Severity</h3>
+
+<a href="/history?severity=ALL"
+class="filter-btn {% if severity == 'ALL' %}active{% endif %}">
+All
+</a>
+
+<a href="/history?severity=MEDIUM"
+class="filter-btn {% if severity == 'MEDIUM' %}active{% endif %}">
+Medium
+</a>
+
+<a href="/history?severity=HIGH"
+class="filter-btn {% if severity == 'HIGH' %}active{% endif %}">
+High
+</a>
+
+<a href="/history?severity=CRITICAL"
+class="filter-btn {% if severity == 'CRITICAL' %}active{% endif %}">
+Critical
+</a>
+
+</div>
+
+<div class="card">
+
+<h3>Search IP Address</h3>
+
+<form method="GET">
+
+<input
+    type="text"
+    name="ip"
+    placeholder="Search IP..."
+    value="{{ ip }}"
+>
+
+<button type="submit">
+Search
+</button>
+
+</form>
+
+</div>
+
+<div class="card">
+
+<h3>Total Results: {{ alerts|length }}</h3>
+
 <table>
 
 <tr>
     <th>Timestamp</th>
     <th>Severity</th>
     <th>IP Address</th>
-    <th>Alert Description</th>
+    <th>Description</th>
 </tr>
 
 {% for alert in alerts %}
 
 <tr>
 
-    <td>{{ alert[0] }}</td>
+<td>{{ alert[0] }}</td>
 
-    {% if alert[1] == "CRITICAL" %}
-        <td class="critical">{{ alert[1] }}</td>
-    {% else %}
-        <td class="high">{{ alert[1] }}</td>
-    {% endif %}
+{% if alert[1] == "CRITICAL" %}
+<td class="critical">{{ alert[1] }}</td>
 
-    <td>{{ alert[2] }}</td>
-    <td>{{ alert[3] }}</td>
+{% elif alert[1] == "HIGH" %}
+<td class="high">{{ alert[1] }}</td>
+
+{% else %}
+<td class="medium">{{ alert[1] }}</td>
+
+{% endif %}
+
+<td>{{ alert[2] }}</td>
+
+<td>{{ alert[3] }}</td>
 
 </tr>
 
 {% endfor %}
 
 </table>
+
+</div>
 
 </body>
 

@@ -51,51 +51,30 @@ def dashboard():
 
             # MITRE ATT&CK Mapping
 
-            if any(
-                "T1110" in alert
-                for alert in alerts
-            ):
+            if any("T1110" in alert for alert in alerts):
                 techniques.append(
-                    (
-                        "T1110",
-                        "Brute Force"
-                    )
+                    ("T1110", "Brute Force")
                 )
 
-            if any(
-                "T1078" in alert
-                for alert in alerts
-            ):
+            if any("T1078" in alert for alert in alerts):
                 techniques.append(
-                    (
-                        "T1078",
-                        "Valid Accounts"
-                    )
+                    ("T1078", "Valid Accounts")
                 )
 
             iocs = extract_iocs(events)
 
-            # Severity Counts
+            # Alert Counters
 
             high_alerts = len(
-                [
-                    a for a in alerts
-                    if "[HIGH]" in a
-                ]
+                [a for a in alerts if "[HIGH]" in a]
             )
 
             medium_alerts = len(
-                [
-                    a for a in alerts
-                    if "[MEDIUM]" in a
-                ]
+                [a for a in alerts if "[MEDIUM]" in a]
             )
 
             critical_alerts = len(
-                [
-                    a for a in alerts
-                    if "[CRITICAL]" in a
-                ]
+                [a for a in alerts if "[CRITICAL]" in a]
             )
 
             # Save Alerts
@@ -157,11 +136,26 @@ def dashboard():
 @app.route("/history")
 def history():
 
-    alerts = get_alerts()
+    severity = request.args.get(
+        "severity",
+        "ALL"
+    )
+
+    ip = request.args.get(
+        "ip",
+        ""
+    )
+
+    alerts = get_alerts(
+        severity,
+        ip
+    )
 
     return render_template(
         "history.html",
-        alerts=alerts
+        alerts=alerts,
+        severity=severity,
+        ip=ip
     )
 
 
