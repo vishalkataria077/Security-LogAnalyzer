@@ -1,6 +1,7 @@
 import re
 
 def parse_log(file_path):
+
     events = []
 
     with open(file_path, "r") as file:
@@ -19,6 +20,7 @@ def parse_log(file_path):
         )
 
         if failed:
+
             events.append({
                 "event": "failed_login",
                 "user": failed.group(1),
@@ -26,6 +28,7 @@ def parse_log(file_path):
             })
 
         elif accepted:
+
             events.append({
                 "event": "successful_login",
                 "user": accepted.group(1),

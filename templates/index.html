@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>AI Security Log Analyzer</title>
+
+<style>
+
+body{
+    background:#0d1117;
+    color:white;
+    font-family:Arial;
+    margin:40px;
+}
+
+.card{
+    background:#161b22;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:20px;
+}
+
+.risk{
+    font-size:32px;
+    font-weight:bold;
+}
+
+.high{
+    color:orange;
+}
+
+.critical{
+    color:red;
+}
+
+h1{
+    color:#58a6ff;
+}
+
+.stats{
+    display:flex;
+    gap:20px;
+}
+
+.stat-card{
+    background:#161b22;
+    padding:20px;
+    border-radius:10px;
+    flex:1;
+    text-align:center;
+}
+
+button{
+    padding:10px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🛡 AI Security Log Analyzer</h1>
+
+<form method="POST" enctype="multipart/form-data">
+
+    <input type="file" name="logfile">
+
+    <button type="submit">
+        Analyze Log
+    </button>
+
+</form>
+
+<br>
+
+<div class="card">
+
+    <div class="risk">
+        Risk Score: {{ risk_score }}/10
+    </div>
+
+</div>
+
+<div class="stats">
+
+    <div class="stat-card">
+        <h2>Total Events</h2>
+        <h3>{{ total_events }}</h3>
+    </div>
+
+    <div class="stat-card">
+        <h2>Failed Logins</h2>
+        <h3>{{ failed_logins }}</h3>
+    </div>
+
+    <div class="stat-card">
+        <h2>Successful Logins</h2>
+        <h3>{{ successful_logins }}</h3>
+    </div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+<h2>Security Alerts</h2>
+
+<ul>
+
+{% for alert in alerts %}
+
+{% if "CRITICAL" in alert %}
+<li class="critical">{{ alert }}</li>
+
+{% elif "HIGH" in alert %}
+<li class="high">{{ alert }}</li>
+
+{% else %}
+<li>{{ alert }}</li>
+{% endif %}
+
+{% endfor %}
+
+</ul>
+
+</div>
+
+<div class="card">
+
+<h2>Indicators of Compromise</h2>
+
+<ul>
+
+{% for ip in iocs %}
+<li>{{ ip }}</li>
+{% endfor %}
+
+</ul>
+
+</div>
+
+</body>
+</html>
