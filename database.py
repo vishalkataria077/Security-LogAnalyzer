@@ -9,19 +9,62 @@ def init_db():
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS alerts (
+
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+
             severity TEXT,
+
             ip TEXT,
+
             description TEXT
         )
     """)
 
     conn.commit()
+
     conn.close()
 
 
-def save_alert(severity, ip, description):
+def alert_exists(ip, description):
+
+    conn = sqlite3.connect("alerts.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT id
+        FROM alerts
+        WHERE ip = ?
+        AND description = ?
+        LIMIT 1
+        """,
+        (
+            ip,
+            description
+        )
+    )
+
+    result = cursor.fetchone()
+
+    conn.close()
+
+    return result is not None
+
+
+def save_alert(
+    severity,
+    ip,
+    description
+):
+
+    if alert_exists(
+        ip,
+        description
+    ):
+        return
 
     conn = sqlite3.connect("alerts.db")
 
@@ -45,6 +88,7 @@ def save_alert(severity, ip, description):
     )
 
     conn.commit()
+
     conn.close()
 
 
