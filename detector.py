@@ -10,6 +10,8 @@ def analyze_events(events):
 
         ip = event["ip"]
 
+        user = event["user"]
+
         if event["event"] == "failed_login":
 
             failed_count[ip] = (
@@ -19,6 +21,13 @@ def analyze_events(events):
         elif event["event"] == "successful_login":
 
             successful_ips.add(ip)
+
+            # Admin / Privileged Account Login Detection
+            if user.lower() in ["admin", "root", "administrator"]:
+
+                alerts.append(
+                    f"[MEDIUM] Privileged Account Login ({user}) from {ip}"
+                )
 
     for ip, count in failed_count.items():
 

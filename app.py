@@ -2,8 +2,13 @@ from flask import Flask, render_template, request
 from parser import parse_log
 from detector import analyze_events
 from ioc import extract_iocs
+from database import init_db, save_alert, get_alerts
 
 app = Flask(__name__)
+
+# Initialize SQLite database
+init_db()
+
 
 @app.route("/", methods=["GET", "POST"])
 def dashboard():
@@ -30,6 +35,22 @@ def dashboard():
 
             iocs = extract_iocs(events)
 
+            # Save alerts to SQLite database
+            for alert in alerts:
+
+                severity = "HIGH"
+
+                if "CRITICAL" in alert:
+                    severity = "CRITICAL"
+
+                ip = iocs[0] if iocs else "Unknown"
+
+                save_alert(
+                    severity,
+                    ip,
+                    alert
+                )
+
             risk_score = min(len(alerts) * 5, 10)
 
             total_events = len(events)
@@ -51,6 +72,18 @@ def dashboard():
         failed_logins=failed_logins,
         successful_logins=successful_logins
     )
+
+
+@app.route("/history")
+def history():
+
+    alerts = get_alerts()
+
+    return render_template(
+        "history.html",
+        alerts=alerts
+    )
+
 
 if __name__ == "__main__":
     app.run(debug=True)

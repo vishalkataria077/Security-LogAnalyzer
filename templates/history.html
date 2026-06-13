@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Alert History</title>
+
+    <style>
+
+        body{
+            background:#0d1117;
+            color:white;
+            font-family:Arial;
+            margin:40px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th, td{
+            border:1px solid gray;
+            padding:10px;
+        }
+
+        th{
+            background:#161b22;
+        }
+
+        .critical{
+            color:red;
+            font-weight:bold;
+        }
+
+        .high{
+            color:orange;
+            font-weight:bold;
+        }
+
+        a{
+            color:#58a6ff;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h1>📜 Alert History</h1>
+
+<p>
+    <a href="/">← Back to Dashboard</a>
+</p>
+
+<table>
+
+<tr>
+    <th>Timestamp</th>
+    <th>Severity</th>
+    <th>IP Address</th>
+    <th>Alert Description</th>
+</tr>
+
+{% for alert in alerts %}
+
+<tr>
+
+    <td>{{ alert[0] }}</td>
+
+    {% if alert[1] == "CRITICAL" %}
+        <td class="critical">{{ alert[1] }}</td>
+    {% else %}
+        <td class="high">{{ alert[1] }}</td>
+    {% endif %}
+
+    <td>{{ alert[2] }}</td>
+    <td>{{ alert[3] }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+
+</html>
