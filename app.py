@@ -8,11 +8,14 @@ from flask import (
 from parser import parse_log
 from detector import analyze_events
 from ioc import extract_iocs
+from correlation import correlate
 
 from database import (
     init_db,
     save_alert,
-    get_alerts
+    save_incident,
+    get_alerts,
+    get_incidents
 )
 
 app = Flask(__name__)
@@ -24,6 +27,7 @@ init_db()
 def dashboard():
 
     alerts = []
+    incidents = []
     iocs = []
     techniques = []
 
@@ -49,21 +53,21 @@ def dashboard():
 
             alerts = analyze_events(events)
 
-            # MITRE ATT&CK Mapping
+            incidents = correlate(alerts)
 
             if any("T1110" in alert for alert in alerts):
+
                 techniques.append(
                     ("T1110", "Brute Force")
                 )
 
             if any("T1078" in alert for alert in alerts):
+
                 techniques.append(
                     ("T1078", "Valid Accounts")
                 )
 
             iocs = extract_iocs(events)
-
-            # Alert Counters
 
             high_alerts = len(
                 [a for a in alerts if "[HIGH]" in a]
@@ -77,8 +81,6 @@ def dashboard():
                 [a for a in alerts if "[CRITICAL]" in a]
             )
 
-            # Save Alerts
-
             for alert in alerts:
 
                 severity = "HIGH"
@@ -89,12 +91,23 @@ def dashboard():
                 elif "[MEDIUM]" in alert:
                     severity = "MEDIUM"
 
-                ip = iocs[0] if iocs else "Unknown"
+                ip = "Unknown"
+
+                if "from " in alert:
+                    ip = alert.split("from ")[-1]
 
                 save_alert(
                     severity,
                     ip,
                     alert
+                )
+
+            for incident in incidents:
+
+                save_incident(
+                    incident["severity"],
+                    incident["ip"],
+                    incident["description"]
                 )
 
             risk_score = min(
@@ -121,6 +134,7 @@ def dashboard():
     return render_template(
         "index.html",
         alerts=alerts,
+        incidents=incidents,
         iocs=iocs,
         techniques=techniques,
         risk_score=risk_score,

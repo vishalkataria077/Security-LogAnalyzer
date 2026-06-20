@@ -91,6 +91,19 @@ body{
     color:#ef4444;
 }
 
+.incident-box{
+    border-left:5px solid #ef4444;
+    background:#111827;
+    padding:20px;
+    margin-bottom:15px;
+    border-radius:8px;
+}
+
+.empty{
+    color:#8b949e;
+    font-style:italic;
+}
+
 button{
     background:#238636;
     color:white;
@@ -177,7 +190,24 @@ Export CSV
 <div class="card">
 
 <div class="risk">
+
+{% if risk_score >= 8 %}
+<span class="critical">
 Risk Score: {{ risk_score }}/10
+</span>
+
+{% elif risk_score >= 5 %}
+<span class="high">
+Risk Score: {{ risk_score }}/10
+</span>
+
+{% else %}
+<span class="medium">
+Risk Score: {{ risk_score }}/10
+</span>
+
+{% endif %}
+
 </div>
 
 </div>
@@ -214,6 +244,13 @@ Risk Score: {{ risk_score }}/10
 <h3 class="critical">{{ critical_alerts }}</h3>
 </div>
 
+<div class="stat-card">
+<h2>Incidents</h2>
+<h3 class="critical">
+{{ incidents|length }}
+</h3>
+</div>
+
 </div>
 
 <div class="card">
@@ -221,6 +258,8 @@ Risk Score: {{ risk_score }}/10
 <h2>Security Alerts</h2>
 
 <br>
+
+{% if alerts %}
 
 <ul>
 
@@ -237,11 +276,61 @@ Risk Score: {{ risk_score }}/10
 
 {% else %}
 <li>{{ alert }}</li>
+
 {% endif %}
 
 {% endfor %}
 
 </ul>
+
+{% else %}
+
+<p class="empty">
+No alerts detected.
+</p>
+
+{% endif %}
+
+</div>
+
+<div class="card">
+
+<h2>Security Incidents</h2>
+
+<br>
+
+{% if incidents %}
+
+{% for incident in incidents %}
+
+<div class="incident-box">
+
+<div class="critical">
+{{ incident.severity }}
+</div>
+
+<br>
+
+<strong>IP Address:</strong>
+{{ incident.ip }}
+
+<br><br>
+
+<strong>Description:</strong>
+
+{{ incident.description }}
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<p class="empty">
+No incidents detected.
+</p>
+
+{% endif %}
 
 </div>
 
@@ -251,6 +340,8 @@ Risk Score: {{ risk_score }}/10
 
 <br>
 
+{% if iocs %}
+
 <ul>
 
 {% for ip in iocs %}
@@ -258,6 +349,14 @@ Risk Score: {{ risk_score }}/10
 {% endfor %}
 
 </ul>
+
+{% else %}
+
+<p class="empty">
+No IOCs found.
+</p>
+
+{% endif %}
 
 </div>
 
@@ -370,4 +469,6 @@ color: 'white'
 </script>
 
 </body>
+
 </html>
+

@@ -1,4 +1,5 @@
 import sqlite3
+import random
 
 
 def init_db():
@@ -13,6 +14,23 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
 
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+            severity TEXT,
+
+            ip TEXT,
+
+            description TEXT
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS incidents (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+            incident_id TEXT,
 
             severity TEXT,
 
@@ -78,6 +96,61 @@ def save_alert(severity, ip, description):
 
     conn.commit()
     conn.close()
+
+
+def save_incident(severity, ip, description):
+
+    conn = sqlite3.connect("alerts.db")
+
+    cursor = conn.cursor()
+
+    incident_id = f"INC-{random.randint(1000,9999)}"
+
+    cursor.execute(
+        """
+        INSERT INTO incidents
+        (
+            incident_id,
+            severity,
+            ip,
+            description
+        )
+        VALUES (?, ?, ?, ?)
+        """,
+        (
+            incident_id,
+            severity,
+            ip,
+            description
+        )
+    )
+
+    conn.commit()
+    conn.close()
+
+
+def get_incidents():
+
+    conn = sqlite3.connect("alerts.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            timestamp,
+            incident_id,
+            severity,
+            ip,
+            description
+        FROM incidents
+        ORDER BY id DESC
+    """)
+
+    incidents = cursor.fetchall()
+
+    conn.close()
+
+    return incidents
 
 
 def get_alerts(severity=None, ip=None):
